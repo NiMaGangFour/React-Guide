@@ -2,46 +2,67 @@ import React, { Component } from "react";
 import logo from "./logo.svg";
 import "./App.css";
 
-import UserInput from "./Component/UserInput";
-import UserOutput from "./Component/UserOutput";
+import ValidationComponent from "./components/ValidationComponent";
+import CharComponent from "./components/CharComponent";
 
 class App extends Component {
   state = {
-    userDetail: [
-      { username: "SiyuDota2", action: "Playing Carry" },
-      { username: "Xiao Ming", action: "Escaping" },
-      { username: "Wang Nima", action: "Roshaning" }
-    ]
+    text: "Type here!",
+    array: ["Type", "here!"],
+    length: null,
+    showString: true
   };
 
-  changeUsernameHandler = () => {
+  changeHandler = event => {
+    let inputText = [...this.state.text];
+    inputText = event.target.value;
+
+    let inputArray = inputText.split(" ").map(str => str.trim());
+
+    let inputLength = inputArray.length;
+
+    console.log(inputArray);
+
     this.setState({
-      userDetail: [
-        { username: "SiyuLOL", action: "Playing Carry" },
-        { username: "Xiao WangBa", action: "Escaping" },
-        { username: "Wang Ergou", action: "Roshaning" }
-      ]
+      length: inputLength,
+      array: inputArray,
+      text: inputText
     });
   };
 
-  switchActionHandler = () => {
+  removeHandler = (event, str) => {
+    console.log(str);
+    let array = [...this.state.array];
+    const stringIndex = array.findIndex(s => {
+      return s === str;
+    });
+
+    array.splice(stringIndex, 1);
+    let text = array.join(" ");
+    console.log(text);
+
+    // let show = this.state.showString;
     this.setState({
-      userDetail: [
-        { username: "SiyuLOL", action: "Coding one by one" },
-        { username: "Xiao WangBa", action: "Warding" },
-        { username: "Wang Ergou", action: "Chasing" }
-      ]
+      array: array,
+      text: text
     });
   };
 
-  inputHandler = event => {
-    this.setState({
-      userDetail: [
-        { username: event.target.value, action: "Coding one by one" },
-        { username: "Xiao WangBa", action: "Warding" },
-        { username: "Wang Ergou", action: "Chasing" }
-      ]
-    });
+  renderCharComponent = () => {
+    return (
+      <div>
+        {this.state.array.map((string, index) => {
+          return (
+            <div key={index}>
+              <CharComponent
+                click={event => this.removeHandler(event, string)}
+                str={string}
+              />
+            </div>
+          );
+        })}
+      </div>
+    );
   };
 
   render() {
@@ -50,30 +71,16 @@ class App extends Component {
     };
     return (
       <div className="App">
-        <button style={style} onClick={() => this.switchActionHandler()}>
-          A Button
-        </button>
-        <UserInput
-          username={this.state.userDetail[0].username}
-          inputHandler={this.inputHandler.bind(this)}
+        <p>{this.state.text}</p>
+        <input
+          type="text"
+          onChange={event => this.changeHandler(event)}
+          value={this.state.text}
         />
-        <UserOutput
-          click={this.changeUsernameHandler}
-          username={this.state.userDetail[0].username}
-          action={this.state.userDetail[0].action}
-          person="Siyu"
-        />
-        <UserOutput
-          username={this.state.userDetail[1].username}
-          action={this.state.userDetail[1].action}
-          person="Spec"
-        />
-        <UserOutput
-          click
-          username={this.state.userDetail[2].username}
-          action={this.state.userDetail[2].action}
-          person="lazy Siyu"
-        />
+        <p>Length:{this.state.length} </p>
+
+        <ValidationComponent length={this.state.length} />
+        {this.renderCharComponent()}
       </div>
     );
   }
